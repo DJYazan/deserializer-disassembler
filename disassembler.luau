@@ -1,5 +1,5 @@
 local LuauCeption
-if game:HttpGet == nil then
+if game.HttpGet == nil then
 	LuauCeption = loadstring(game:GetService("HttpService"):GetAsync("https://raw.githubusercontent.com/DJYazan/LuauCeption/main/LuauCeption.luau"))() -- MUST HAVE LOADSTRING AND HTTPSERVICE
 else
 	LuauCeption = loadstring(game:HttpGet("https://raw.githubusercontent.com/DJYazan/LuauCeption/main/LuauCeption.luau"))()
@@ -1785,5 +1785,11 @@ function disassemble(bytecode, is_compiled)
 	return table.concat(code, "\n")
 end
 
-getfenv().disassemble = disassemble
---getfenv().decompile = disassemble
+print(deserialize([[
+print("Hello World")
+local a = {}
+a.b = "Hello M"
+for i, v in pairs(a) do
+	print(v)
+end
+]], false))
