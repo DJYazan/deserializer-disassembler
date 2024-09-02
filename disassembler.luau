@@ -1762,21 +1762,23 @@ local base64 = (function()
 		decode = dec
 	}
 end)()
-function disassemble(bytecode, is_compiled)
+function disassemble(bytecode, is_compiled, is_roblox)
 	local settings = fiu.luau_newsettings()
 	if is_compiled == false then
 		bytecode = LuauCeption.luau_compile(bytecode)
 	end
 	function deserialize(raw_bytecode, roblox_offset)
-		if roblox_offset == nil then
+		if roblox_offset == nil and is_compiled == false then
 			roblox_offset = true
+		elseif is_compiled == true then
+			roblox_offset = false
 		end
 		settings.robloxOffset = roblox_offset
 		settings.vectorCtor = Vector3.new
 		return fiu.luau_deserialize(raw_bytecode, settings)
 	end
 	local code = {}
-	local deserialized = deserialize(bytecode, true)
+	local deserialized = deserialize(bytecode, is_roblox)
 	local instructions = deserialized.mainProto.code
 	table.insert(code, `[CONSTANTS]: {inspect(deserialized.mainProto.k)}`)
 	for i, v in pairs(instructions) do
@@ -1784,12 +1786,3 @@ function disassemble(bytecode, is_compiled)
 	end
 	return table.concat(code, "\n")
 end
-
-print(deserialize([[
-print("Hello World")
-local a = {}
-a.b = "Hello M"
-for i, v in pairs(a) do
-	print(v)
-end
-]], false))
