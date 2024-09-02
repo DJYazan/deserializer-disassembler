@@ -1,4 +1,9 @@
-Compile = require(script.vLuau).luau_compile
+local LuauCeption
+if game:HttpGet == nil then
+	LuauCeption = loadstring(game:GetService("HttpService"):GetAsync("https://raw.githubusercontent.com/DJYazan/LuauCeption/main/LuauCeption.luau"))() -- MUST HAVE LOADSTRING AND HTTPSERVICE
+else
+	LuauCeption = loadstring(game:HttpGet("https://raw.githubusercontent.com/DJYazan/LuauCeption/main/LuauCeption.luau"))()
+end
 local inspect = (function()
 	local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local math = _tl_compat and _tl_compat.math or math; local string = _tl_compat and _tl_compat.string or string; local table = _tl_compat and _tl_compat.table or table
 	local inspect = {Options = {}, }
@@ -1759,6 +1764,9 @@ local base64 = (function()
 end)()
 function disassemble(bytecode, is_compiled)
 	local settings = fiu.luau_newsettings()
+	if is_compiled == false then
+		bytecode = LuauCeption.luau_compile(bytecode)
+	end
 	function deserialize(raw_bytecode, roblox_offset)
 		if roblox_offset == nil then
 			roblox_offset = true
@@ -1777,21 +1785,5 @@ function disassemble(bytecode, is_compiled)
 	return table.concat(code, "\n")
 end
 
-local encoded = "BQIRBGdhbWUKUnVuU2VydmljZQpHZXRTZXJ2aWNlC1J1biBTZXJ2aWNlBHdvcmQFd29yZDERUmVwbGljYXRlZFN0b3JhZ2UEdGFzawR3YWl0B1BsYXllcnMLTG9jYWxQbGF5ZXIJQ2hhcmFjdGVyBXByaW50GUNoYXJhY3RlciBMb2FkZWQsIFlpcHBpZSEBag5GaW5kRmlyc3RDaGlsZBZKIHBsYXllciBqb2luZWQgbG9sIDopAQcAAAEAADWjAAAApAABAAAAAEBvAgIAvAAAFgMAAACfAAMCpAIBAAAAAEBNAQLPBAAAAOICBwDGAwAAMAMCAQUAAACkBAEAAAAAQE0DBD8IAAAAMAMC4QYAAACkAwsAACiQgJ8DAQGkBgEAAAAAQE0FBlAMAAAATQQFMQ0AAABNAwRpDgAAACsDAQBIAPP/SADy/6QDEAAAAPBAbwQRAJ8DAgGkBAEAAAAAQE0DBFAMAAAAbwUSALwDAwMTAAAAnwMDAg4DBACkAxAAAADwQG8EFACfAwIBggABABUDAQQAAABAAwIDAwMEAwUDBgUCBQYDBwMIAwkEACiQgAMKAwsDDAMNBAAA8EADDgMPAxADEQABAAEYAAAAAAAAAAEAAAACAAAAAAAAAAAAAwAAAAAAAAAAAAAAAP8EAAAAAgAAAAAAAAAAAQAAAAQBAAAAAAA="
-
---encoded = "BgMQBUxvYmJ5CkxvYmJ5Vm9pY2UER2FtZQxJbnRlcm1pc3Npb24FRm9vbHMEZ2FtZQZHYW1lSWQLUnVuIFNlcnZpY2UISXNTdHVkaW8HUGxhY2VJZAVwcmludBLimqDvuI/imqDvuI/imqDvuI8BWwFdECBGT1JDRUQgTU9ERSBUTyApLiBDSEFOR0UgSU4gUkVQTElDQVRFREZJUlNUID4gR0VUUExBQ0VJRCEAAQoAAAEAAEyjAAAA/wAEAAAAAABvAQAAMAEAPgEAAABvAQIAMAEAtgMAAABvAQQAMAEAvQUAAABvAQYAMAEA0QcAAABvAQYAMAEAvggAAACkAgoAAACQQE0BArsLAAAADQETAAwAAID/AQQAAAAAAG8CDQAwAgE+AQAAAG8CDgAwAgG2AwAAAG8CDwAwAgG9BQAAAG8CEAAwAgHRBwAAAG8CEAAwAgG+CAAAAFIAAQCkAgoAAACQQE0BAs8RAAAAvAEBChIAAACfAQICDgEZAFIBAADGAgAAxgMAAGQBAgDGBgAAagYABG4B/f8CAAAApAIKAAAAkEBNAQLFEwAAADABAL0FAAAApAEVAAAAQEFvAxYAbwQXAIwFAQBvBhgAbwcZAG8IBQBvCRoAcwIDCZ8BAgGCAAIAGwIAALDpRkb4QQMBAgAA+HgT7QZCAwICAAAwqld6+UEDAwIAABDli6YDQgMEAwUDBgQAAJBAAwcCAAAgk22Q7EECAABwfBqmA0ICAAD4qm+8BUICAADgIyimA0ICAAAwcCimA0IDCAMJAwoDCwQAAEBBAwwDDQMOAw8DEAABAAEYAAIAAQAAAQAAAQAAAQAAAQAAAwAAAAAAAQABAAABAAABAAABAAABAAAABAAAAAAAAAACAAAAAQD/AAMAAAAAAAIAAAAAAAAAAAAABQEAAAAAAA=="
--- Step 1: Base64 decode
-local decoded = base64.decode(encoded)
-if not decoded then
-	error("Error decoding the base64 string.")
-end
-
--- Step 2: Decompile
-local decompiled = disassemble(decoded)
---local tokens = luaParser.tokenize(decompiled)
---local ast    = luaParser.parse(tokens)
---luaParser.optimize(ast)
---luaParser.printTree(ast)
-
---local lua = luaParser.toLua(ast, true)
-print(decompiled)
+getfenv().disassemble = disassemble
+--getfenv().decompile = disassemble
