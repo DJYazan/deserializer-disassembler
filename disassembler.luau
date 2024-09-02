@@ -1,5 +1,5 @@
 local LuauCeption
-if game.HttpGet == nil then
+if game["Run Service"]:IsStudio() == true then
 	LuauCeption = loadstring(game:GetService("HttpService"):GetAsync("https://raw.githubusercontent.com/DJYazan/LuauCeption/main/LuauCeption.luau"))() -- MUST HAVE LOADSTRING AND HTTPSERVICE
 else
 	LuauCeption = loadstring(game:HttpGet("https://raw.githubusercontent.com/DJYazan/LuauCeption/main/LuauCeption.luau"))()
